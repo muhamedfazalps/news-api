@@ -3,76 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Top News Headlines</title>
+    <title>Professional News App</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            line-height: 1.6;
-        }
-        h1 {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
             color: #333;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark-mode {
+            background-color: #1e1e2f;
+            color: #eee;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
             text-align: center;
+        }
+        .dark-mode header {
+            background-color: #1e1e40;
+        }
+        header h1 {
+            margin: 0;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 10px;
+        }
+        .controls input {
+            flex: 1;
+            padding: 8px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .controls button {
+            padding: 8px 16px;
+            font-size: 1rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .dark-mode .controls button {
+            background-color: #1e1e40;
+        }
+        .controls button:hover {
+            background-color: #0056b3;
+        }
+        .toggle-dark-mode {
+            background-color: transparent;
+            border: 1px solid #007bff;
+            color: #007bff;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .dark-mode .toggle-dark-mode {
+            border-color: #eee;
+            color: #eee;
         }
         .news-container {
             max-width: 800px;
             margin: 0 auto;
             padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            background-color: #f9f9f9;
         }
-        .article {
+        .news-card {
+            background-color: white;
+            padding: 15px;
             margin-bottom: 20px;
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s;
         }
-        .article:last-child {
-            border-bottom: none;
+        .dark-mode .news-card {
+            background-color: #2e2e4e;
+            box-shadow: none;
         }
-        .article h2 {
+        .news-card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .news-card h2 {
             font-size: 1.2em;
-            color: #007BFF;
             margin: 0;
         }
-        .article h2 a {
+        .news-card h2 a {
             text-decoration: none;
+            color: #007bff;
         }
-        .article h2 a:hover {
+        .dark-mode .news-card h2 a {
+            color: #56a0ff;
+        }
+        .news-card h2 a:hover {
             text-decoration: underline;
         }
-        .meta {
-            color: #555;
+        .news-card p {
             font-size: 0.9em;
+            color: #555;
+        }
+        .dark-mode .news-card p {
+            color: #ddd;
+        }
+        .loading {
+            text-align: center;
+            margin-top: 50px;
+        }
+        .loading img {
+            width: 50px;
         }
         .error {
-            color: red;
             text-align: center;
+            color: red;
             margin-top: 20px;
+        }
+        .error button {
+            background-color: #ff4d4d;
+            border: none;
+            padding: 8px 16px;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .error button:hover {
+            background-color: #cc0000;
         }
     </style>
 </head>
 <body>
-    <h1>Top News Headlines</h1>
-    <div class="news-container" id="news-container">
-        <!-- News articles will be injected here -->
+    <header>
+        <h1>Professional News App</h1>
+    </header>
+
+    <div class="controls">
+        <input type="text" id="search-input" placeholder="Search news by keyword...">
+        <button onclick="fetchNews()">Search</button>
+        <button class="toggle-dark-mode" onclick="toggleDarkMode()">Toggle Dark Mode</button>
     </div>
-    <div class="error" id="error-message"></div>
+
+    <div class="news-container" id="news-container"></div>
+    <div class="loading" id="loading" style="display: none;">
+        <img src="https://i.gifer.com/YCZH.gif" alt="Loading">
+    </div>
+    <div class="error" id="error-message" style="display: none;">
+        <p>Failed to load news. Please try again later.</p>
+        <button onclick="fetchNews()">Retry</button>
+    </div>
 
     <script>
-        const API_KEY = "02f580555dca8fd65f692ea4012d9e4d"; // Your provided API key
+        const API_KEY = "02f580555dca8fd65f692ea4012d9e4d";
         const BASE_URL = "https://gnews.io/api/v4/top-headlines";
         const newsContainer = document.getElementById('news-container');
+        const loading = document.getElementById('loading');
         const errorMessage = document.getElementById('error-message');
+        let isDarkMode = false;
 
-        // Function to fetch news from GNews API
+        // Toggle Dark Mode
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode', isDarkMode);
+        }
+
+        // Fetch News
         async function fetchNews() {
+            const query = document.getElementById('search-input').value;
             const params = new URLSearchParams({
                 apikey: API_KEY,
                 lang: "en",
                 country: "us",
                 max: 10,
+                q: query || "", // Add query for search
             });
+
+            newsContainer.innerHTML = "";
+            errorMessage.style.display = "none";
+            loading.style.display = "block";
 
             try {
                 const response = await fetch(`${BASE_URL}?${params}`);
@@ -81,14 +193,16 @@
                 }
 
                 const data = await response.json();
+                loading.style.display = "none";
                 displayNews(data.articles);
             } catch (error) {
                 console.error(error);
-                errorMessage.textContent = "Failed to load news. Please try again later.";
+                loading.style.display = "none";
+                errorMessage.style.display = "block";
             }
         }
 
-        // Function to display news on the page
+        // Display News
         function displayNews(articles) {
             if (!articles || articles.length === 0) {
                 newsContainer.innerHTML = "<p>No news articles found.</p>";
@@ -96,9 +210,9 @@
             }
 
             newsContainer.innerHTML = articles.map(article => `
-                <div class="article">
+                <div class="news-card">
                     <h2><a href="${article.url}" target="_blank">${article.title}</a></h2>
-                    <p class="meta">Source: ${article.source.name} | Published: ${new Date(article.publishedAt).toLocaleString()}</p>
+                    <p>Source: ${article.source.name} | Published: ${new Date(article.publishedAt).toLocaleString()}</p>
                 </div>
             `).join('');
         }
