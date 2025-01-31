@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional News App</title>  
+    <title> Newsses </title>  
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -111,7 +111,7 @@
 </head>
 <body>
     <header>
-        <h1>Professional News App</h1>
+        <h1> Newsses </h1>
     </header>
 
     <div class="controls">
@@ -215,7 +215,7 @@
             newsContainer.innerHTML = articles.map(article => `
                 <div class="news-card">
                     <h2><a href="${article.url}" target="_blank">${article.title}</a></h2>
-                    <p>Source: ${article.source.name} | Published: ${timeAgo(article.publishedAt)}</p>
+                    <p> ${article.source.name} | ${timeAgo(article.publishedAt)}</p>
                 </div>
             `).join('');
         }
