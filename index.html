@@ -9,50 +9,50 @@
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f9;
-            color: #333;
+            background-color: #f8f9fa;
+            color: #212529;
             transition: background-color 0.3s, color 0.3s;
         }
         .dark-mode {
-            background-color: #1e1e2f;
-            color: #eee;
+            background-color: #121212;
+            color: #f8f9fa;
         }
         header {
-            background-color: #007bff;
+            background-color: #343a40;
             color: white;
-            padding: 10px 20px;
+            padding: 15px 20px;
             text-align: center;
         }
         .dark-mode header {
-            background-color: #1e1e40;
+            background-color: #1c1c1c;
         }
         .controls {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             max-width: 800px;
             margin: 20px auto;
             padding: 10px;
+            gap: 10px;
         }
         .controls input {
             flex: 1;
-            padding: 8px;
+            padding: 10px;
             font-size: 1rem;
             border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-right: 10px;
+            border-radius: 5px;
         }
         .controls button {
-            padding: 8px 16px;
+            padding: 10px 16px;
             font-size: 1rem;
             background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
         }
         .dark-mode .controls button {
-            background-color: #1e1e40;
+            background-color: #1c1c1c;
         }
         .controls button:hover {
             background-color: #0056b3;
@@ -122,10 +122,10 @@
 
     <div class="offline-notice" id="offline-notice">No internet connection! Showing saved news.</div>
     <div class="news-container" id="news-container"></div>
-    <div class="loading" id="loading" style="display: none;">
+    <div class="loading" id="loading" style="display: none; text-align: center;">
         <img src="https://i.gifer.com/YCZH.gif" alt="Loading">
     </div>
-    <div class="error" id="error-message" style="display: none;">
+    <div class="error" id="error-message" style="display: none; text-align: center;">
         <p>Failed to load news. Please try again later.</p>
         <button onclick="fetchNews()">Retry</button>
     </div>
