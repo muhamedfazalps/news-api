@@ -86,13 +86,13 @@
             background-color: #2e2e4e;
             box-shadow: none;
         }
-        .news-card h2 {
-            font-size: 1.2em;
-            margin: 0;
-        }
         .news-card h2 a {
-            text-decoration: none;
-            color: #007bff;
+        text-decoration: none;
+        color: black; /* Changed from #007bff to black */
+        }
+
+        .dark-mode .news-card h2 a {
+            color: #cccccc; /* Slightly lighter black for dark mode */
         }
         .dark-mode .news-card h2 a {
             color: #56a0ff;
@@ -167,7 +167,7 @@
             if (months > 0) return rtf.format(-months, 'month');
             if (days > 0) return rtf.format(-days, 'day');
             if (hours > 0) return rtf.format(-hours, 'hour');
-            if (minutes > 0) return rtf.format(-minutes, 'minute');
+            if (minutes > 0) return rtf.format(-minutes, 'min');
             return rtf.format(-seconds, 'second');
         }
     
