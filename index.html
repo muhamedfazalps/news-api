@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional News App</title>
+    <title>Professional News App</title>  
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -17,123 +17,17 @@
             background-color: #1e1e2f;
             color: #eee;
         }
-        header {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-        }
-        .dark-mode header {
-            background-color: #1e1e40;
-        }
-        header h1 {
-            margin: 0;
-        }
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 10px;
-        }
-        .controls input {
-            flex: 1;
-            padding: 8px;
-            font-size: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-right: 10px;
-        }
-        .controls button {
-            padding: 8px 16px;
-            font-size: 1rem;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .dark-mode .controls button {
-            background-color: #1e1e40;
-        }
-        .controls button:hover {
-            background-color: #0056b3;
-        }
-        .toggle-dark-mode {
-            background-color: transparent;
-            border: 1px solid #007bff;
-            color: #007bff;
-            margin-left: 10px;
-            cursor: pointer;
-        }
-        .dark-mode .toggle-dark-mode {
-            border-color: #eee;
-            color: #eee;
-        }
-        .news-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 10px;
-        }
-        .news-card {
-            background-color: white;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: box-shadow 0.3s;
-        }
-        .dark-mode .news-card {
-            background-color: #2e2e4e;
-            box-shadow: none;
-        }
-        .news-card:hover {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .news-card h2 {
-            font-size: 1.2em;
-            margin: 0;
-        }
-        .news-card h2 a {
-            text-decoration: none;
-            color: #007bff;
-        }
-        .dark-mode .news-card h2 a {
-            color: #56a0ff;
-        }
-        .news-card h2 a:hover {
-            text-decoration: underline;
-        }
-        .news-card p {
-            font-size: 0.9em;
-            color: #555;
-        }
-        .dark-mode .news-card p {
-            color: #ddd;
-        }
-        .loading {
-            text-align: center;
-            margin-top: 50px;
-        }
-        .loading img {
-            width: 50px;
-        }
-        .error {
+        .offline-notice {
+            display: none;
             text-align: center;
             color: red;
-            margin-top: 20px;
+            font-weight: bold;
+            margin: 20px;
+            animation: fadeIn 1s ease-in-out;
         }
-        .error button {
-            background-color: #ff4d4d;
-            border: none;
-            padding: 8px 16px;
-            color: white;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-        .error button:hover {
-            background-color: #cc0000;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
@@ -148,6 +42,7 @@
         <button class="toggle-dark-mode" onclick="toggleDarkMode()">Toggle Dark Mode</button>
     </div>
 
+    <div class="offline-notice" id="offline-notice">No internet connection! Showing saved news.</div>
     <div class="news-container" id="news-container"></div>
     <div class="loading" id="loading" style="display: none;">
         <img src="https://i.gifer.com/YCZH.gif" alt="Loading">
@@ -163,15 +58,14 @@
         const newsContainer = document.getElementById('news-container');
         const loading = document.getElementById('loading');
         const errorMessage = document.getElementById('error-message');
+        const offlineNotice = document.getElementById('offline-notice');
         let isDarkMode = false;
 
-        // Toggle Dark Mode
         function toggleDarkMode() {
             isDarkMode = !isDarkMode;
             document.body.classList.toggle('dark-mode', isDarkMode);
         }
 
-        // Fetch News
         async function fetchNews() {
             const query = document.getElementById('search-input').value;
             const params = new URLSearchParams({
@@ -179,36 +73,38 @@
                 lang: "en",
                 country: "us",
                 max: 10,
-                q: query || "", // Add query for search
+                q: query || "",
             });
 
             newsContainer.innerHTML = "";
             errorMessage.style.display = "none";
             loading.style.display = "block";
+            offlineNotice.style.display = "none";
 
             try {
                 const response = await fetch(`${BASE_URL}?${params}`);
                 if (!response.ok) {
                     throw new Error(`Error: ${response.status}`);
                 }
-
+                
                 const data = await response.json();
                 loading.style.display = "none";
+                localStorage.setItem('savedNews', JSON.stringify(data.articles));
                 displayNews(data.articles);
             } catch (error) {
                 console.error(error);
                 loading.style.display = "none";
                 errorMessage.style.display = "block";
+                loadSavedNews();
             }
         }
 
-        // Display News
         function displayNews(articles) {
             if (!articles || articles.length === 0) {
                 newsContainer.innerHTML = "<p>No news articles found.</p>";
                 return;
             }
-
+            
             newsContainer.innerHTML = articles.map(article => `
                 <div class="news-card">
                     <h2><a href="${article.url}" target="_blank">${article.title}</a></h2>
@@ -217,7 +113,14 @@
             `).join('');
         }
 
-        // Fetch news on page load
+        function loadSavedNews() {
+            const savedNews = localStorage.getItem('savedNews');
+            if (savedNews) {
+                offlineNotice.style.display = "block";
+                displayNews(JSON.parse(savedNews));
+            }
+        }
+
         fetchNews();
     </script>
 </body>
