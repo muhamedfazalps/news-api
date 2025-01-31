@@ -144,12 +144,33 @@
         const errorMessage = document.getElementById('error-message');
         const offlineNotice = document.getElementById('offline-notice');
         let isDarkMode = false;
-
+    
         function toggleDarkMode() {
             isDarkMode = !isDarkMode;
             document.body.classList.toggle('dark-mode', isDarkMode);
         }
-
+    
+        // Helper function to calculate time ago
+        function timeAgo(publishedAt) {
+            const now = new Date();
+            const publishedDate = new Date(publishedAt);
+            const seconds = Math.floor((now - publishedDate) / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            const months = Math.floor(days / 30);
+            const years = Math.floor(months / 12);
+            
+            const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+    
+            if (years > 0) return rtf.format(-years, 'year');
+            if (months > 0) return rtf.format(-months, 'month');
+            if (days > 0) return rtf.format(-days, 'day');
+            if (hours > 0) return rtf.format(-hours, 'hour');
+            if (minutes > 0) return rtf.format(-minutes, 'minute');
+            return rtf.format(-seconds, 'second');
+        }
+    
         async function fetchNews() {
             const query = document.getElementById('search-input').value;
             const category = document.getElementById('category-select').value;
@@ -161,12 +182,12 @@
                 q: query || "",
             });
             if (category) params.append("category", category);
-
+    
             newsContainer.innerHTML = "";
             errorMessage.style.display = "none";
             loading.style.display = "block";
             offlineNotice.style.display = "none";
-
+    
             try {
                 const response = await fetch(`${BASE_URL}?${params}`);
                 if (!response.ok) {
@@ -184,7 +205,7 @@
                 loadSavedNews();
             }
         }
-
+    
         function displayNews(articles) {
             if (!articles || articles.length === 0) {
                 newsContainer.innerHTML = "<p>No news articles found.</p>";
@@ -194,13 +215,14 @@
             newsContainer.innerHTML = articles.map(article => `
                 <div class="news-card">
                     <h2><a href="${article.url}" target="_blank">${article.title}</a></h2>
-                    <p>Source: ${article.source.name} | Published: ${new Date(article.publishedAt).toLocaleString()}</p>
+                    <p>Source: ${article.source.name} | Published: ${timeAgo(article.publishedAt)}</p>
                 </div>
             `).join('');
         }
-
+    
         fetchNews();
     </script>
+    
 </body>
 </html>
 
