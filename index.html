@@ -17,6 +17,46 @@
             background-color: #1e1e2f;
             color: #eee;
         }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        .dark-mode header {
+            background-color: #1e1e40;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 10px;
+        }
+        .controls input {
+            flex: 1;
+            padding: 8px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .controls button {
+            padding: 8px 16px;
+            font-size: 1rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .dark-mode .controls button {
+            background-color: #1e1e40;
+        }
+        .controls button:hover {
+            background-color: #0056b3;
+        }
         .offline-notice {
             display: none;
             text-align: center;
@@ -28,6 +68,44 @@
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
+        }
+        .news-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        .news-card {
+            background-color: white;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s;
+        }
+        .dark-mode .news-card {
+            background-color: #2e2e4e;
+            box-shadow: none;
+        }
+        .news-card h2 {
+            font-size: 1.2em;
+            margin: 0;
+        }
+        .news-card h2 a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        .dark-mode .news-card h2 a {
+            color: #56a0ff;
+        }
+        .news-card h2 a:hover {
+            text-decoration: underline;
+        }
+        .news-card p {
+            font-size: 0.9em;
+            color: #555;
+        }
+        .dark-mode .news-card p {
+            color: #ddd;
         }
     </style>
 </head>
