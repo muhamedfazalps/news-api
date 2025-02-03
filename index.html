@@ -149,7 +149,36 @@
             isDarkMode = !isDarkMode;
             document.body.classList.toggle('dark-mode', isDarkMode);
         }
-    
+        function toggleCommentBox(index) {
+            const commentBox = document.getElementById(`comment-box-${index}`);
+            commentBox.style.display = commentBox.style.display === "none" ? "block" : "none";
+        }
+
+        function postComment(index) {
+            const inputField = document.getElementById(`comment-input-${index}`);
+            const commentText = inputField.value.trim();
+
+            if (commentText === "") return;
+
+            let comments = JSON.parse(localStorage.getItem(`comments-${index}`)) || [];
+            comments.push(commentText);
+            localStorage.setItem(`comments-${index}`, JSON.stringify(comments));
+
+            inputField.value = "";
+            displayComments(index);
+        }
+
+        function displayComments(index) {
+            const commentsContainer = document.getElementById(`comments-list-${index}`);
+            let comments = JSON.parse(localStorage.getItem(`comments-${index}`)) || [];
+
+            commentsContainer.innerHTML = comments.map(comment => `<p>🗨️ ${comment}</p>`).join('');
+        }
+
+        function loadAllComments(articles) {
+            articles.forEach((_, index) => displayComments(index));
+        }
+
         // Helper function to calculate time ago
         function timeAgo(publishedAt) {
             const now = new Date();
@@ -206,19 +235,28 @@
             }
         }
     
-        function displayNews(articles) {
+                function displayNews(articles) {
             if (!articles || articles.length === 0) {
                 newsContainer.innerHTML = "<p>No news articles found.</p>";
                 return;
             }
-            
-            newsContainer.innerHTML = articles.map(article => `
+
+            newsContainer.innerHTML = articles.map((article, index) => `
                 <div class="news-card">
                     <h2><a href="${article.url}" target="_blank">${article.title}</a></h2>
-                    <p> ${article.source.name} | ${timeAgo(article.publishedAt)}</p>
+                    <p>${article.source.name} | ${timeAgo(article.publishedAt)}</p>
+                    <button class="comment-btn" onclick="toggleCommentBox(${index})">💬</button>
+                    <div class="comment-section" id="comment-box-${index}" style="display: none;">
+                        <input type="text" id="comment-input-${index}" placeholder="Write a comment...">
+                        <button onclick="postComment(${index})">Post</button>
+                        <div id="comments-list-${index}"></div>
+                    </div>
                 </div>
             `).join('');
+
+            loadAllComments(articles);
         }
+
     
         fetchNews();
     </script>
